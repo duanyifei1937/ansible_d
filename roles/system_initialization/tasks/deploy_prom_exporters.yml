@@ -1,0 +1,57 @@
+- tags:
+    - prometheus
+  block:
+    - name: mkdir /data/prometheus
+      file:
+        path:       /data/prometheus
+        state:      directory
+        owner:      '{{ init_account_user }}'
+        group:      '{{ init_account_group }}'
+
+    - name: copy node_exporter
+      unarchive:
+        remote_src: no
+        src:        '{{init_node_exporter_dir}}.tar.gz'
+        dest:       /data/prometheus
+        group:      '{{ init_account_group }}'
+        owner:      '{{ init_account_user }}'
+
+    - name: copy pushgateway
+      unarchive:
+        remote_src: no
+        src:        '{{init_pushgateway_dir}}.tar.gz'
+        dest:       /data/prometheus
+        group:      '{{ init_account_group }}'
+        owner:      '{{ init_account_user }}'
+
+    - name: soft link to node_exporter
+      file:
+        state:  link
+        force:  yes
+        src:    '/data/prometheus/{{init_node_exporter_dir}}'
+        path:   /data/prometheus/node_exporter
+        owner:  '{{ init_account_user }}'
+        group:  '{{ init_account_group }}'
+
+
+    - name: soft link to pushgateway
+      file:
+        state:  link
+        force:  yes
+        src:    '/data/prometheus/{{init_pushgateway_dir}}'
+        dest:   /data/prometheus/pushgateway
+        owner:  '{{ init_account_user }}'
+        group:  '{{ init_account_group }}'
+
+    - name: copy prom_exporter supervisor conf
+      template:
+        src:    '{{ item }}.conf.j2'
+        dest:   '/data/supervisor/config/conf.d/{{ item }}.conf'
+        owner:  work
+        group:  work
+        mode:   '0644'
+      with_items:
+        - node_exporter
+        - pushgateway
+      changed_when: True
+      notify: restart prom

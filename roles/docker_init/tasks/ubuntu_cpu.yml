@@ -1,0 +1,81 @@
+---
+# tasks file for docker-setup
+- name: Update repositories cache and install dependent package
+  apt:
+    name: '{{item}}'
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Add an Apt signing key, uses whichever key is at the URL
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: apt_repository
+  command: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+
+- name: apt-get update
+  command: apt-get update
+  ignore_errors: yes
+
+- name: Install docker-ce
+  apt:
+    name: docker-ce
+
+- name: Init deploy path
+  file:
+    state:  directory
+    owner:  root
+    group:  root
+    path:   /data/docker
+
+- name: On ip forward
+  sysctl:
+    ignoreerrors: yes
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  tags:
+    - ip_forward
+
+- name: Mkdir /etc/docker directory
+  file:
+    state:  directory
+    path:   /etc/docker
+  tags:
+    - mkdir_etc_path
+
+- name: Copy daemon.json
+  copy:
+    src: cpu_daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0600
+  tags:
+    - daemon_config
+  notify:
+    - Restart docker-daemon
+    - Enable docker
+
+- name: Add work account to docker group
+  user:
+    name: work
+    append: yes
+    groups:
+      - docker
+  tags:
+    - groups
+
+- name: install docker-compose
+  copy:
+    src:        docker-compose
+    dest:       /usr/local/bin/docker-compose
+    owner:      root
+    group:      root
+    mode:       0755
+  tags:
+    - compose

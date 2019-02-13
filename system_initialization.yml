@@ -1,0 +1,6 @@
+---
+- name  : centos_init
+  hosts : new
+  gather_facts : yes
+  roles :
+    - system_initialization

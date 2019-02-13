@@ -1,0 +1,25 @@
+- tags:
+    - jdk
+  block:
+    - name: copy jdk to /data/soft
+      unarchive:
+        remote_src:     no
+        src:            '{{init_jdk_version}}.tgz'
+        dest:           /data/soft
+        keep_newer:     no
+        group:          '{{init_account_group}}'
+        owner:          '{{init_account_user}}'
+
+    - name: jdk variable configuration ~/.bashrc file
+      shell: /bin/echo '{{ item }}' >> /home/{{ init_account_user }}/.bashrc
+      with_items:
+         - export PS1="[\u@\h \w]\$ "
+         - export HISTTIMEFORMAT="`whoami` %F %T "
+         - export JAVA_HOME=/data/soft/{{ init_jdk_version }}
+         - export PATH=$JAVA_HOME/bin:$PATH
+         - export CLASSPATH=.:$JAVA_HOME/lib/
+
+    - name: source environment variable
+      shell: source /home/{{ init_account_user }}/.bashrc
+      args:
+        executable: /bin/bash

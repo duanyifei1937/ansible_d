@@ -1,0 +1,37 @@
+- tags:
+    - disk_partition
+  block:
+    - name: disk partition
+      parted:
+        device:     '{{init_disk_device}}'
+        label:      '{{init_disk_label}}'
+        number:     '{{init_partition_number}}'
+        part_start: '{{init_partition_start}}'
+        part_end:   '{{init_partition_end}}'
+        part_type:  '{{init_partition_type}}'
+        state:      present
+      register:     result
+      #failed_when: result.failed is defined  and "No such file or directory" not in result.err
+    
+    - name: create filesystem
+      filesystem:
+        fstype:     '{{init_fs_type}}'
+        force:      '{{init_fs_force}}'
+        dev:        '{{init_fs_dev}}'
+      register:     result
+      #failed_when:  result.failed is defined and  "not found" not in result.err
+    
+    - name: mount device
+      mount:
+        boot:       yes
+        fstype:     '{{init_fs_type}}'
+        path:       '/data'
+        src:        '{{init_fs_dev}}'
+        state:      mounted
+    
+    - name: /data chown work
+      file:
+        path:     /data
+        state:    directory
+        group:    '{{init_account_group}}'
+        owner:    '{{init_account_user}}'

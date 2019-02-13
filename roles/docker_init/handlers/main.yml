@@ -1,0 +1,13 @@
+---
+# handlers file for docker-setup
+- name: Restart docker-daemon
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker
+
+- name: Enable docker
+  systemd:
+    name: docker
+    enabled: yes
+    masked: no

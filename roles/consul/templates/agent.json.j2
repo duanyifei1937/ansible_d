@@ -1,0 +1,30 @@
+{
+  "bind_addr": "{{ ansible_default_ipv4.address }}",
+
+  "client_addr": "0.0.0.0",
+
+  "node_name": "{{ ansible_default_ipv4.address }}",
+
+  "ports": {
+    "http" : 8560,
+    "dns" : 8561,
+    "server" : 8562,
+    "serf_lan" : 8563,
+    "serf_wan" : 8564
+  },
+
+  "datacenter": "{{ DC_ENV }}",
+
+  "server": false,
+
+  "data_dir": "/data/deploy/consul/data",
+
+  "log_level": "INFO",
+
+  "check_update_interval" : "10s",
+
+  "enable_script_checks": true,
+
+  "retry_join": {{ CONSUL_SERVER }},
+  "retry_interval": "30s"
+}

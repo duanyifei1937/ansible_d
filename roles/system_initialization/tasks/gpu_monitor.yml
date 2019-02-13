@@ -1,0 +1,11 @@
+- tags:
+    - gpu_monitor
+  block:
+    - name: gpu monitor script to cron
+      unarchive:
+        remote_src:     no
+        src:            gpu_monitor_prome.tgz
+        dest:           /data/op_cron_jobs/cron_minutely
+        keep_newer:     no
+        group:          '{{init_account_group}}'
+        owner:          '{{init_account_user}}'

@@ -1,0 +1,91 @@
+---
+# tasks file for centos_init
+- include_tasks: init_account.yml
+  tags:
+    - account
+
+- stat: path=/DATA/disk1
+  register: phy
+  tags:
+    - disk_partition
+- include_tasks: vm_disk_partition.yml
+  tags:
+    - disk_partition
+  when: phy.stat.exists == False 
+- include_tasks: phy_disk_partition.yml
+  tags:
+    - disk_partition
+  when: phy.stat.exists == True
+
+- include_tasks: add_env.yml
+  tags:
+    - env
+
+- include_tasks: deploy_python.yml
+  tags:
+    - python
+
+- include_tasks: init_cron_path.yml
+  tags: 
+    - cron
+
+- include_tasks: library_file.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - library_file
+
+- include_tasks: init_supervisor.yml
+  tags:
+    - supervisor
+- meta: flush_handlers
+
+# 判断是否k8s node,安装node-export
+- include_tasks: deploy_prom_exporters.yml
+  tags: 
+    - prometheus
+  when: k8s is undefined
+- meta: flush_handlers
+  when: k8s is undefined
+
+- include_tasks: init_jdk1.8.yml
+  tags: 
+    - jdk
+
+- include_tasks: centos_modify_ulimit.yml
+  when: ansible_os_family == "RedHat"
+  tags: 
+    - ulimit
+
+- include_tasks: ubuntu_modify_ulimit.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - ulimit
+
+- include_tasks: ssh_hosts_allow.yml
+  tags:
+    - ssh_allow
+
+- include_tasks: mkdir_deploy_path.yml
+  tags:
+    - deploy_dir
+
+- include_tasks: hosts.yml
+  tags:
+    - hosts
+
+- include_tasks: kafka_host_add.yml
+  tags:
+    - kafka_hosts
+
+- include_tasks: data_logs.yml
+  tags:
+    - data_logs
+
+- stat: path=/usr/bin/nvidia-smi
+  register: nvidia
+  tags:
+    - gpu_monitor
+- include_tasks: gpu_monitor.yml
+  tags:
+    - gpu_monitor
+  when: nvidia.stat.exists == True

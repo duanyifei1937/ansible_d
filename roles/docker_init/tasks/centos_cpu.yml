@@ -1,0 +1,85 @@
+---
+# tasks file for docker-setup
+- name: Init deploy path
+  file: 
+    state:  directory
+    owner:  root
+    group:  root
+    path:   /data/docker
+  tags:
+    - mkdir_path 
+
+- name: Install dependencies
+  yum:
+    name:           '{{item}}'
+    update_cache:   yes
+  with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2 
+  tags:
+    - install_depend
+
+- name: Add docker repo
+  get_url:
+    url:            http://download.docker.com/linux/centos/docker-ce.repo
+    dest:           /etc/yum.repos.d/docker-ce.repo
+    force:          yes
+  tags:
+    - add_repo
+
+- name: Install docker
+  yum:
+    name:           docker-ce   
+    update_cache:   yes
+  tags:
+    - install
+    
+- name: On ip forward
+  sysctl:
+    ignoreerrors: yes
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  tags:
+    - ip_forward
+
+- name: Mkdir /etc/docker directory
+  file:
+    state:  directory
+    path:   /etc/docker
+  tags:
+    - mkdir_etc_path
+
+- name: Copy daemon.json
+  copy:
+    src: cpu_daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0600
+  tags:
+    - daemon_config
+  notify:       
+    - Restart docker-daemon
+    - Enable docker
+
+# sudo usermod -aG docker work
+- name: Add work account to docker group
+  user:
+    name: work
+    append: yes
+    groups:        
+      - docker 
+  tags:
+    - groups
+
+- name: install docker-compose
+  copy:
+    src:        docker-compose
+    dest:       /usr/local/bin/docker-compose
+    owner:      root
+    group:      root
+    mode:       0755
+  tags:
+    - compose

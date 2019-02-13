@@ -1,0 +1,20 @@
+- tags:
+    - ulimit
+  block:
+    - name: modify soft ulimit
+      replace:
+        path:     /etc/security/limits.conf
+        regexp:   '^\* soft nofile 65535$'
+        replace:  '* soft nofile 655350'
+
+    - name: modify hard ulimit
+      replace:
+        path:     /etc/security/limits.conf
+        regexp:   '^\* hard nofile 65535$'
+        replace:  '* hard nofile 655350'
+
+    - name: modify max user processes
+      replace:
+        path:     /etc/security/limits.d/20-nproc.conf
+        regexp:   '^\*          soft    nproc     4096$'
+        replace:  '*          soft    nproc     40960'

@@ -1,0 +1,7 @@
+---
+# consul init
+- name  : k8s_public
+  hosts : kube-node
+  gather_facts : yes
+  roles :
+    - k8s_public

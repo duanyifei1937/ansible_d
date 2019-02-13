@@ -1,0 +1,26 @@
+- tags:
+    - cron
+  block:
+    - name: mkdir /data/op_cron_jobs
+      file:
+        path:       '{{ item }}'
+        #mode:       '0755'
+        state:      directory
+        #recurse:    yes
+        owner:      '{{ init_account_user }}'
+        group:      '{{ init_account_group }}'
+      with_items:
+    #    - /data
+        - /data/op_cron_jobs
+        - /data/op_cron_jobs/cron_hourly
+        - /data/op_cron_jobs/cron_minutely
+        - /data/op_cron_jobs/cron_daily
+        - /data/op_cron_jobs/cron_5_minutely
+
+    - name: init cron scripts
+      template:
+        src:    op_cron_jobs.j2
+        dest:   /etc/cron.d/op_cron_jobs
+        mode:   '0644'
+        owner:  root
+        group:  root

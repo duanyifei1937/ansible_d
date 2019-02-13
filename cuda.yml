@@ -1,0 +1,6 @@
+---
+- name  : cuda_init
+  hosts : new
+  gather_facts : yes
+  roles :
+    - cuda_init

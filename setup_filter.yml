@@ -1,0 +1,7 @@
+---
+- hosts: new
+  gather_facts: yes
+  tasks:
+    - name: test ip
+      debug:
+        msg: "ip:{{ansible_default_ipv4.address}}, hostname:{{ansible_nodename}}"

@@ -1,0 +1,23 @@
+- tags:
+    - python
+  block:
+    - name: mkdir /data/soft
+      file:
+        path: /data/soft
+        state: directory
+        group:    '{{init_account_group}}'
+        owner:    '{{init_account_user}}'
+        #mode:     '0755'
+        recurse:  yes
+
+    - name: copy python to /data/soft
+      unarchive:
+        remote_src:     no
+        src:            '{{ item }}'
+        dest:           /data/soft
+        keep_newer:     no
+        group:          '{{init_account_group}}'
+        owner:          '{{init_account_user}}'
+      with_items:
+        - '{{init_python2_version}}.tgz'
+        - '{{init_python3_version}}.tgz'

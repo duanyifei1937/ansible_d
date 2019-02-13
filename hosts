@@ -1,0 +1,21 @@
+[new]
+# 传参判断是否k8s node, super是否安装
+# 10.66.0.11 非k8s节点
+# 10.66.0.11 k8s=1 k8s节点
+
+
+
+[titanv]
+172.16.18.8 HOSTNAME='phy172-16-18-8.ksc.com'
+10.46.19.2 k8s=1 HOSTNAME="phy10-46-19-2.ksc.com"
+
+
+
+#----------------
+
+[consul_agent]
+
+
+[consul_agent:vars]
+DC_ENV='online'
+CONSUL_SERVER='["10.66.1.20:8563","10.66.1.7:8563","10.66.1.4:8563"]'

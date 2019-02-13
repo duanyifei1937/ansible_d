@@ -1,0 +1,12 @@
+{
+    "default-runtime": "nvidia",
+    "runtimes": {
+        "nvidia": {
+            "path": "/usr/bin/nvidia-container-runtime",
+            "runtimeArgs": [ ]
+        }
+    },
+    "graph": "/data/docker",
+    "metrics-addr" : "0.0.0.0:9323",
+    "experimental" : true
+}

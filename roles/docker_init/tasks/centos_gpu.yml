@@ -1,0 +1,97 @@
+---
+# tasks file for docker-setup
+- name: Init deploy path
+  file:
+    state:  directory
+    owner:  root
+    group:  root
+    path:   /data/docker
+
+- name: Install dependencies
+  yum:
+    name:           '{{item}}'
+    update_cache:   yes
+  with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+- name: Add docker repo
+  get_url:
+    url:            https://download.docker.com/linux/centos/docker-ce.repo
+    dest:           /etc/yum.repos.d/docker-ce.repo
+    force:          yes
+
+# nvidia-docker 不支持最新docker-18.08，指定特定版本docker
+# docker-ce-18.09.0-3.el7.x86_64
+- name: Install docker
+  yum:
+#    name:           docker-ce-18.06.1.ce-3.el7.x86_64
+    name:              docker-ce-18.09.0-3.el7.x86_64
+#    name:              docker-ce
+    update_cache:      yes
+    disable_gpg_check: yes
+
+- name: On ip forward
+  sysctl:
+    ignoreerrors: yes
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Mkdir /etc/docker directory
+  file:
+    state:  directory
+    path:   /etc/docker
+
+- name: Remove nvidia-docker1.0 volume
+  shell: docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
+
+- name: Remove nvidia-docker
+  yum:
+    name: nvidia-docker
+    state: absent
+
+- name: Add nvidia-docker repo
+  get_url:
+    url:            https://nvidia.github.io/nvidia-docker/centos7/x86_64/nvidia-docker.repo
+    dest:           /etc/yum.repos.d/nvidia-docker.repo
+    force:          yes
+
+- name: Install nvidia-docker2
+#  yum:
+#    name: nvidia-docker2
+#    validate_certs: no
+  command: yum -y install nvidia-docker2
+
+- name: Copy daemon.json
+  copy:
+    src: gpu_daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0600
+  tags:
+    - daemon_config
+  notify:
+    - Restart docker-daemon
+    - Enable docker
+
+- name: Add work account to docker group
+  user:
+    name: work
+    append: yes
+    groups:
+      - docker
+  tags:
+    - groups
+
+- name: install docker-compose
+  copy:
+    src:        docker-compose
+    dest:       /usr/local/bin/docker-compose
+    owner:      root
+    group:      root
+    mode:       0755
+  tags:
+    - compose

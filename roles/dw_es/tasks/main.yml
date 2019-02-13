@@ -1,0 +1,72 @@
+---
+# 拷贝安装文件并解压
+# 覆盖之前配置文件并追加super
+# supervisor reload
+- name: add vm.max_map_count
+  blockinfile:
+    marker: "# vm.max_map_count"
+    path: /etc/sysctl.conf
+    block: 'vm.max_map_count=262144'
+
+- name: flash sysctl
+  shell: sysctl -w vm.max_map_count=262144
+
+- name: copy elasticsearch-6.1.1.zip
+  unarchive:
+    remote_src: no
+    src:        'elasticsearch-6.1.1.zip'
+    dest:       /data/
+    group:      '{{ init_account_group }}'
+    owner:      '{{ init_account_user }}'
+  tags: copy_install_file
+
+- name: Copy x-pack-6.1.1.jar
+  copy:
+    src: x-pack-6.1.1.jar
+    dest: /data/soft/
+    mode: 0644
+
+- name: copy elasticsearch.yml
+  template:
+    src:  elasticsearch.yml.j2
+    dest: /data/elasticsearch-6.1.1/config/elasticsearch.yml
+  tags: cover_es_config
+
+- name: copy jvm.options
+  template:
+    src:  jvm.options.j2
+    dest: /data/elasticsearch-6.1.1/config/jvm.options
+  tags: cover_es_jvm_config
+
+- name: mkdir /data/elasticsearch-6.1.1/logs
+  file:
+    path:       /data/elasticsearch-6.1.1/logs
+    state:      directory
+    owner:      '{{ init_account_user }}'
+    group:      '{{ init_account_group }}'
+
+- name: copy supervisor config
+  template:
+    src:  elasticsearch.conf.j2
+    dest: /data/supervisor/config/conf.d/elasticsearch.conf
+  tags: supervisor_config
+
+- name: set premission
+  shell: chown work:work /data/elasticsearch-6.1.1/*
+
+# modify supervisor minfs
+- name: copy supervisor conf
+  template:
+    src:    supervisord.conf.j2
+    dest:   /data/supervisor/config/supervisord.conf
+    owner:  root
+    group:  root
+    mode:   '0644'
+
+# java bash
+- name: root java
+  shell: ln -s /data/soft/jdk1.8.0_101/bin/java /bin/java
+
+#- name: restart supervisor
+#  shell: kill -9 $(ps -ef | grep super | awk '{print $2}') && /data/soft/python2.7/bin/supervisord -c /data/supervisor/config/supervisord.conf
+#  ignore_errors: yes

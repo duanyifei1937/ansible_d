@@ -1,0 +1,7 @@
+---
+# consul init
+- name  : dw-es
+  hosts : dw-es
+  gather_facts : yes
+  roles :
+    - dw_es

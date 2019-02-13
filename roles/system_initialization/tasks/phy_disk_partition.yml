@@ -1,0 +1,10 @@
+- tags:
+    - disk_partition
+  block:
+    - name: phy disk soft link
+      file:
+        src: /DATA/disk1
+        dest: /data
+        state: link
+        group: '{{init_account_group}}'
+        owner: '{{init_account_user}}'

@@ -1,0 +1,7 @@
+---
+# kubernetes cni flannel to calico
+- name  : calico_init
+  hosts : new
+  gather_facts : no
+  roles :
+    - calico_init

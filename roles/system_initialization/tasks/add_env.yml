@@ -1,0 +1,14 @@
+- tags:
+    - env
+  block:
+    - name: add env to bashrc
+      blockinfile:
+        path: /home/work/.bashrc
+        block: |
+          if [ -f /etc/profile ]; then
+            . /etc/profile
+          fi
+    - name: source bashrc
+      shell: source /home/work/.bashrc
+      args:
+        executable: /bin/bash

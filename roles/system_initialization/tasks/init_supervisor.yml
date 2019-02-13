@@ -1,0 +1,24 @@
+- tags:
+    - supervisor
+  block:
+    - name: mkdir /data/supervisor
+      file:
+        state:  directory
+        path:   '{{ item }}'
+        owner:  '{{ init_account_user }}'
+        group:  '{{ init_account_group }}'
+      with_items:
+        - /data/supervisor
+        - /data/supervisor/log
+        - /data/supervisor/config
+        - /data/supervisor/config/conf.d
+
+    - name: copy supervisor conf
+      template:
+        src:    supervisord.conf.j2
+        dest:   /data/supervisor/config/supervisord.conf
+        owner:  root
+        group:  root
+        mode:   '0644'
+      changed_when: True
+      notify: start supervisor

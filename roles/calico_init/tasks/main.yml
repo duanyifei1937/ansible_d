@@ -1,0 +1,26 @@
+---
+# 替换docker.service
+# 替换kubelet.config
+# systemctl daemon-reload
+# docker restart
+
+# centos & ubuntu docker.service 路径不一致
+# centos: /usr/lib/systemd/system
+# ubuntu: /lib/systemd/system
+- name: 替换docker.service
+  template:
+    src: docker.service.j2
+    dest: "{{ SYSTEM_SERVICE_DIR }}/docker.service"
+  tags: docker_service_file
+
+- name: 修改kubelet env文件
+  template:
+    src: kubelet.j2
+    dest: "{{ KUBERNETES_DIR }}/kubelet"
+  tags: kubelet_config_file
+
+- name: restart docker
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker

@@ -1,0 +1,7 @@
+---
+# consul init
+- name  : consul_agent
+  hosts : consul_agent
+  gather_facts : yes
+  roles :
+    - consul

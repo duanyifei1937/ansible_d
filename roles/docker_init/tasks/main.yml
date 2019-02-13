@@ -1,0 +1,15 @@
+---
+- stat: path=/usr/bin/nvidia-smi
+  register: nvidia
+
+- include_tasks: centos_cpu.yml
+  when: "(nvidia.stat.exists != True) and (ansible_os_family == 'RedHat')"
+
+- include_tasks: ubuntu_cpu.yml
+  when: "(nvidia.stat.exists != True) and (ansible_os_family == 'Debian')"
+
+- include_tasks: centos_gpu.yml
+  when: "(nvidia.stat.exists == True) and (ansible_os_family == 'RedHat')"
+
+- include_tasks: ubuntu_gpu.yml
+  when: "(nvidia.stat.exists == True) and (ansible_os_family == 'Debian')"

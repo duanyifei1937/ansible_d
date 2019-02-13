@@ -1,0 +1,23 @@
+# ubuntu add miss library file
+- tags:
+    - library_file
+  block:
+    - name: Copy miss library file
+      copy:
+        src: '{{ item }}'
+        dest: /lib/x86_64-linux-gnu
+      with_items:
+        - libssl.so.1.0.2k
+        - libcrypto.so.1.0.2k
+    
+    - name: Make library soft link1
+      file:
+        src: /lib/x86_64-linux-gnu/libssl.so.1.0.2k
+        dest: /lib/x86_64-linux-gnu/libssl.so.10
+        state: link
+    
+    - name: Make library soft link2
+      file:
+        src: /lib/x86_64-linux-gnu/libcrypto.so.1.0.2k
+        dest: /lib/x86_64-linux-gnu/libcrypto.so.10
+        state: link

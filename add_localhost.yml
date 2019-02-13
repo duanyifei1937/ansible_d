@@ -1,0 +1,10 @@
+---
+- name  : add localhost
+  hosts : new
+  gather_facts : yes
+  tasks:
+  	- name: add 127-localhost
+  	  blockinfile:
+        marker: "# local hosts"
+        path: /etc/hosts
+        line: '127.0.0.1 localhost'

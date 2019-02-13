@@ -1,0 +1,11 @@
+- tags:
+    - data_logs
+  block:
+    - name: 创建日志目录
+      file:
+        name: "{{ item }}"
+        state: directory
+        owner: '{{ init_account_user }}'
+        group: '{{ init_account_group }}'
+      with_items:
+        - /data/logs

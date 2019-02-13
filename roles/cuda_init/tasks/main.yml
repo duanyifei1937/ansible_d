@@ -1,0 +1,55 @@
+---
+# tasks file for cuda_init
+# install nvidia 驱动指定版本：NVIDIA-Linux-x86_64-396.51.run
+- name: Download NVIDIA file
+  get_url:
+    url: http://10.66.1.7/download/duanyifei/NVIDIA-Linux-x86_64-396.51.run
+    dest: /root/NVIDIA-Linux-x86_64-396.51.run
+    mode: 775
+  tags: download-nvidia-file
+
+- name: Download cuda file
+  get_url:
+    url: http://10.66.1.7/download/cuda/cuda_9.2.148_396.37_linux.run
+    dest: /root/cuda_9.2.148_396.37_linux.run
+    mode: 775
+  tags: download-cuda-file
+
+- name: Install nvidia
+  command: ./NVIDIA-Linux-x86_64-396.51.run -q -s
+  tags: install-nvidia
+
+- name: Install cuda
+  command: ./cuda_9.2.148_396.37_linux.run --silent --driver --toolkit --run-nvidia-xconfig
+
+  tags: install-cuda
+
+- name: Copy cuda.conf
+  template:
+    src:    cuda.conf.j2
+    dest:   /etc/ld.so.conf.d/cuda.conf
+    owner:  root
+    group:  root
+    mode:   '0644'
+  tags: copy-cuda-conf
+
+- name: ldconfig
+  command: ldconfig
+  tags: ldconfig
+
+- name: Nvidia-smi cache
+  command: nvidia-smi -pm 1
+  tags: nvidia-smi
+
+- name: Modify hostname
+  command: hostnamectl --pretty --static --transient set-hostname {{HOSTNAME}}
+  tags: hostname
+
+- name: Hosts
+  blockinfile:
+    path: /etc/hosts
+    marker: "# hostname ip"
+    insertbefore: BOF
+    block: |
+      {{ ansible_default_ipv4.address }} {{ HOSTNAME }}
+  tags: hosts

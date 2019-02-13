@@ -1,0 +1,29 @@
+---
+# vars file for initialization
+### account vars ###
+init_account_group:     work
+init_account_gid:       500
+init_account_user:      work
+init_account_uid:       500
+### disk vars ###
+init_disk_label:        msdos
+init_disk_device:       /dev/vdb
+init_partition_number:  1
+init_partition_start:   0%
+init_partition_end:     100%
+init_partition_type:    primary
+### filesystem vars ###
+init_fs_type:           ext4
+init_fs_force:          no
+init_fs_dev:            '{{init_disk_device}}1'
+### python vars ###
+init_python2_version:    python2.7
+init_python3_version:    python3.6
+### ssh key vars ###
+init_ssh_keys:
+  - jump_ssh_keys.pub
+### prom exporter vars ###
+init_node_exporter_dir: node_exporter-0.14.0.linux-amd64
+init_pushgateway_dir:   pushgateway-0.4.0.linux-amd64
+### jdk ###
+init_jdk_version:       jdk1.8.0_101

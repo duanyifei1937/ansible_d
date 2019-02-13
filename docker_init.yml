@@ -1,0 +1,7 @@
+---
+# 适用于centos and ubuntu; 自行判断cpu or gpu;
+- name  : docker_init
+  hosts : new
+  gather_facts : yes
+  roles :
+    - docker_init

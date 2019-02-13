@@ -1,0 +1,49 @@
+---
+# tasks file for consul
+- name: 创建consul相关目录
+  file:
+    path:       "{{ item }}"
+    state:      directory
+    owner:      work
+    group:      work
+  with_items:
+    - /data/deploy/consul
+    - /data/deploy/consul/config
+    - /data/deploy/consul/data
+    - /data/logs/consul
+  tags: consul_dir
+
+- name: copy consul 可执行文件
+  unarchive:
+    src: consul_1.3.0_linux_amd64.zip
+    dest: /data/deploy/consul
+    group: work
+  tags: consul_exec
+
+# 每台node绑定服务不需要添加node-export config
+#- name: copy prometheus service register
+#  template:
+#    src: node-export.json.j2
+#    dest: /data/deploy/consul/config/node-export.json
+#  tags: consul_prom_conf
+
+- name: copy consul agent 配置文件
+  template:
+    src:  agent.json.j2
+    dest: /data/deploy/consul/agent.json
+  tags: consul_agent_config
+
+- name: copy supervisor 配置文件
+  template:
+    src:  consul.conf.j2
+    dest: /data/supervisor/config/conf.d/consul.conf
+  tags: consul_super_config
+
+- name: super reread and update
+  shell: /data/soft/python2.7/bin/supervisorctl -c /data/supervisor/config/supervisord.conf reread && /data/soft/python2.7/bin/supervisorctl -c /data/supervisor/config/supervisord.conf update
+  tags: update
+
+#- name: reload consul agent
+#  command: /data/deploy/consul/consul reload -http-addr=127.0.0.1:8560
+#  tags: reload
+

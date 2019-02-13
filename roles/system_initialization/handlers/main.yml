@@ -1,0 +1,13 @@
+---
+# handlers file for ubuntu_init
+- name: start supervisor
+  script:   scripts/start_supervisor.sh
+- name: restart prom
+  supervisorctl:
+    config:             '/data/supervisor/config/supervisord.conf'
+    name:               '{{ item }}'
+    state:              restarted 
+    supervisorctl_path: '/data/soft/{{init_python2_version}}/bin/supervisorctl'
+  with_items:
+    - pushgateway
+    - node_exporter

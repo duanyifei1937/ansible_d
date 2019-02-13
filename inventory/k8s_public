@@ -1,0 +1,11 @@
+[kube-node]
+172.16.18.4  NODE_IP="172.16.18.4"
+
+
+[all:vars]
+# system 服务配置文件路径:
+SYSTEM_SERVICE_DIR=/usr/lib/systemd/system/
+KUBERNETES_DIR=/etc/kubernetes
+CA_DIR=/etc/kubernetes/ssl
+BIN_DIR=/usr/local/bin
+

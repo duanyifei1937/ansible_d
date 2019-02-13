@@ -1,0 +1,9 @@
+- tags:
+    - ssh_allow
+  block:
+    - name:       add ssh allow
+      shell:      /bin/echo '{{ item }}' >> /etc/hosts.allow
+      with_items:
+        - sshd:10.46.29.16:allow
+        - sshd:10.66.1.4:allow
+        - sshd:172.16.17.2:allow

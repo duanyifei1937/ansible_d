@@ -1,0 +1,9 @@
+- tags:
+    - deploy_dir
+  block:
+    - name: mkdir /data/deploy
+      file:
+        path:       /data/deploy
+        state:      directory
+        owner:      '{{ init_account_user }}'
+        group:      '{{ init_account_group }}'
